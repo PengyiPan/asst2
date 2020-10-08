@@ -159,7 +159,7 @@ int main(int argc, char** argv)
                "======================\n");
 
         for (int i = 0; i < N_TASKSYS_IMPLS; i++) {
-//            if ((TaskSystemType) i == SERIAL) continue;
+            if ((TaskSystemType) i == SERIAL || (TaskSystemType) i == PARALLEL_SPAWN || (TaskSystemType) i == PARALLEL_THREAD_POOL_SPINNING) continue; //TODO remove me
             double minT = 1e30;
             for (int j = 0; j < num_timing_iterations; j++) {
 
