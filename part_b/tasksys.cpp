@@ -181,7 +181,7 @@ void TaskSystemParallelThreadPoolSleeping::init_workers() {
                     task.p_irunnable->runTask(task.task_id, task.num_total_tasks);
                     new_task = false;
                     std::lock_guard<std::mutex> tq_lock(this->pending_mtx);
-                    std::cout << "runTask async_id=" << task.async_task_id << " task_id=" << task.task_id << std::endl;
+//                    std::cout << "runTask async_id=" << task.async_task_id << " task_id=" << task.task_id << std::endl;
                     task_left_map[task.async_task_id] -= 1;
                     this->one_task_done_cv.notify_all();
                 } else {
@@ -222,11 +222,12 @@ void TaskSystemParallelThreadPoolSleeping::init_dispatch() {
                         std::lock_guard<std::mutex> lk_add(tq_mtx);
                         for (const auto &tsk: pending_task.task_to_add) {
                             ok_to_run_task_queue.push(tsk);
+                            this->new_task_cv.notify_all();
                         }
-                        std::cout << "dispatching async_task_id=" << async_task_id << " size="
-                                  << pending_task.task_to_add.size() << std::endl;
+//                        std::cout << "dispatching async_task_id=" << async_task_id << " size="
+//                                  << pending_task.task_to_add.size() << std::endl;
                         pending_task_map.erase(it++); // remove from pending task map after insert
-                        this->new_task_cv.notify_all();
+
                     } else {
                         ++it;
                     }
@@ -302,7 +303,7 @@ void TaskSystemParallelThreadPoolSleeping::sync() {
             std::lock_guard<std::mutex> lk(tq_mtx);
             if (!ok_to_run_task_queue.empty()) {
                 sync_done = false;
-                std::cout << "1 ok_to_run_task_queue not empty" << std::endl;
+//                std::cout << "1 ok_to_run_task_queue not empty" << std::endl;
             }
         }
 
@@ -310,12 +311,12 @@ void TaskSystemParallelThreadPoolSleeping::sync() {
             std::lock_guard<std::mutex> lk(pending_mtx);
             if (!pending_task_map.empty()) {
                 sync_done = false;
-                std::cout << "2 pending_task_map not empty" << std::endl;
+//                std::cout << "2 pending_task_map not empty" << std::endl;
             }
             for (const auto &tl: task_left_map) {
                 if (tl.second.load() != 0) {
                     sync_done = false;
-                    std::cout << "tl.second.load()=" << tl.second.load() << " breaking"<< std::endl;
+//                    std::cout << "tl.second.load()=" << tl.second.load() << " breaking"<< std::endl;
                     break;
                 }
             }
@@ -324,9 +325,10 @@ void TaskSystemParallelThreadPoolSleeping::sync() {
         if (sync_done) {
             return;
         } else {
-            std::unique_lock<std::mutex> lk(task_done_mtx);
-            this->one_task_done_cv.wait(lk);  // block until new task is finished
-            std::cout << "main checking" << std::endl;
+//            std::unique_lock<std::mutex> lk(task_done_mtx);
+//            this->one_task_done_cv.wait(lk);  // block until new task is finished
+//            std::cout << "main checking" << std::endl;
+            continue;
         }
     }
 }
