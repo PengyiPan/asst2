@@ -60,7 +60,9 @@ TaskSystemParallelSpawn::TaskSystemParallelSpawn(int num_threads) : ITaskSystem(
 
 }
 
-TaskSystemParallelSpawn::~TaskSystemParallelSpawn() {}
+TaskSystemParallelSpawn::~TaskSystemParallelSpawn() {
+
+}
 
 void TaskSystemParallelSpawn::run(IRunnable *runnable, int num_total_tasks) {
 
@@ -75,20 +77,19 @@ void TaskSystemParallelSpawn::run(IRunnable *runnable, int num_total_tasks) {
 //        runnable->runTask(i, num_total_tasks);
 //    }
 
-
-    auto worker_threads_v = std::vector<std::thread>();
     auto tsk_per_td = num_total_tasks / total_threads;
     for (auto i = 0; i < total_threads; ++i) {
         auto tsk_start = i * tsk_per_td;
         auto tsk_end = i == total_threads - 1 ? num_total_tasks : tsk_start + tsk_per_td;
-        worker_threads_v.emplace_back(std::thread([tsk_start, tsk_end, num_total_tasks, &runnable]() {
+        this->worker_threads_v.emplace_back(std::thread([tsk_start, tsk_end, num_total_tasks, &runnable]() {
             for (auto task_id = tsk_start; task_id < tsk_end; task_id++) {
                 runnable->runTask(task_id, num_total_tasks);
             }
         }));
     }
-    for (auto &td: worker_threads_v) {
-        td.join();
+
+    for (auto &td: this->worker_threads_v) {
+        if(td.joinable()) td.join();
     }
 }
 

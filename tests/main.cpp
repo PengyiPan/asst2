@@ -159,11 +159,13 @@ int main(int argc, char** argv)
                "======================\n");
 
         for (int i = 0; i < N_TASKSYS_IMPLS; i++) {
+//            if ((TaskSystemType) i == SERIAL) continue;
             double minT = 1e30;
             for (int j = 0; j < num_timing_iterations; j++) {
 
                 // Create a new task system
                 ITaskSystem *t = selectTaskSystemRefImpl(num_threads, (TaskSystemType) i);
+
 
                 // Run test
                 TestResults result = test[test_id](t);

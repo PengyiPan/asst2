@@ -43,6 +43,7 @@ class TaskSystemParallelSpawn: public ITaskSystem {
 
 private:
 
+    std::vector<std::thread> worker_threads_v;
     int total_threads{0};
 
 };
